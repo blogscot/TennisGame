@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 
 public class Game {
@@ -59,5 +60,9 @@ public class Game {
 
             holder.unlockCanvasAndPost(canvas);
         }
+    }
+
+    public void onTouchEvent(MotionEvent event) {
+        player.setPosition(event);
     }
 }
