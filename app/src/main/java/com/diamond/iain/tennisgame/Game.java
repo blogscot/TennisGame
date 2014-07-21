@@ -31,9 +31,10 @@ public class Game {
         final Bitmap paddleImage = BitmapFactory.decodeResource(resources, R.drawable.paddle);
         final Bitmap paddleShadow = BitmapFactory.decodeResource(resources, R.drawable.paddleshadow);
 
-        final int paddlePosY = (height / 2) - paddleImage.getHeight() / 2;
+        final int paddlePosY = (height - paddleImage.getHeight()) / 2;
 
-        ball = new Ball(width, height, 50, 50);
+        ball = new Ball(width, height, (width - ballImage.getWidth()) / 2,
+                (height - ballImage.getHeight()) / 2);
         player = new Paddle(width, height, width - 100, paddlePosY);
         opponent = new Paddle(width, height, 50, paddlePosY);
 
