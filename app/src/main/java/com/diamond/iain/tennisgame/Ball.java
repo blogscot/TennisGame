@@ -1,7 +1,5 @@
 package com.diamond.iain.tennisgame;
 
-import android.util.Log;
-
 public class Ball extends Sprite {
     private final static String TAG = Ball.class.getSimpleName();
 
@@ -23,19 +21,24 @@ public class Ball extends Sprite {
         x += directionX * speedX * elapsed;
         y += directionY * speedY * elapsed;
 
-        if (x <= 0 || x >= maxWidth) {
-            // Prevent multi-bounce when x has gone past the min or max value such that
-            // it will still be past the min or max after a change of direction. Same for Y value.
-            if (x < 0) x = 0;
-            if (x > maxWidth) x = maxWidth;
-            Log.d(TAG,  "Max Width="+maxWidth+", x=" + x);
+        // Prevents multi-bounce when x or y has gone past the min or max value such that
+        // it will still be past the min or max after a change of direction at the next update.
+        if (x <= 0) {
+            x = 0;
             directionX *= -1;
         }
-        if (y <= 0 || y >= maxHeight) {
-            if (y < 0) y = 0;
-            if (y > maxHeight) y = maxHeight;
-            Log.d(TAG,  "Max Height="+maxHeight+", y=" + y);
+        if (x >= maxWidth) {
+            x = maxWidth;
+            directionX *= -1;
+        }
+        if (y <= 0) {
+            y = 0;
             directionY *= -1;
         }
+        if (y >= maxHeight) {
+            y = maxHeight;
+            directionY *= -1;
+        }
+
     }
 }
