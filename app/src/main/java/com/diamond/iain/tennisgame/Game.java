@@ -24,14 +24,14 @@ public class Game {
 
     public void init() {
 
-        int width = holder.getSurfaceFrame().width();
-        int height = holder.getSurfaceFrame().height();
-        Bitmap ballImage = BitmapFactory.decodeResource(resources, R.drawable.ball);
-        Bitmap ballShadow = BitmapFactory.decodeResource(resources, R.drawable.ballshadow);
-        Bitmap paddleImage = BitmapFactory.decodeResource(resources, R.drawable.paddle);
-        Bitmap paddleShadow = BitmapFactory.decodeResource(resources, R.drawable.paddleshadow);
+        final int width = holder.getSurfaceFrame().width();
+        final int height = holder.getSurfaceFrame().height();
+        final Bitmap ballImage = BitmapFactory.decodeResource(resources, R.drawable.ball);
+        final Bitmap ballShadow = BitmapFactory.decodeResource(resources, R.drawable.ballshadow);
+        final Bitmap paddleImage = BitmapFactory.decodeResource(resources, R.drawable.paddle);
+        final Bitmap paddleShadow = BitmapFactory.decodeResource(resources, R.drawable.paddleshadow);
 
-        int paddlePosY = (height / 2) - paddleImage.getHeight() / 2;
+        final int paddlePosY = (height / 2) - paddleImage.getHeight() / 2;
 
         ball = new Ball(width, height, 50, 50);
         player = new Paddle(width, height, width - 100, paddlePosY);

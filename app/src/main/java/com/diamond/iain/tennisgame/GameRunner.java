@@ -23,7 +23,7 @@ public class GameRunner extends Thread {
         while (isRunning) {
 
             try {
-                Thread.sleep(20);
+                Thread.sleep(40);
             } catch (InterruptedException e) {
                 Log.d(TAG, "sleep interrupted");
             }
