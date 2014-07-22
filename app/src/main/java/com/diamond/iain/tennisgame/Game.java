@@ -1,5 +1,6 @@
 package com.diamond.iain.tennisgame;
 
+import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -8,21 +9,27 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Align;
 import android.graphics.Typeface;
+import android.media.AudioManager;
+import android.media.SoundPool;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 
 public class Game {
 
+    private static final String TAG = Game.class.getSimpleName();
+
+    private SoundPool soundPool;
     private enum State {
         PAUSED, WON, LOST, RUNNING
     }
 
     private State state = State.PAUSED;
 
-    private static final String TAG = Game.class.getSimpleName();
-
+    private Context context;
     private SurfaceHolder holder;
     private Resources resources;
+
+    private int[] sounds = new int[5];
 
     private Ball ball;
     private Paddle player;
@@ -30,20 +37,18 @@ public class Game {
 
     private int width;
     private int height;
+    private int paddlePosY;
 
     private Bitmap ballImage;
     private Bitmap ballShadow;
     private Bitmap paddleImage;
     private Bitmap paddleShadow;
 
-    private int paddlePosY;
+    public Game(Context context, SurfaceHolder holder, Resources resources) {
 
-    public Game(SurfaceHolder holder, Resources resources) {
+        this.context = context;
         this.holder = holder;
         this.resources = resources;
-    }
-
-    public void init() {
 
         width = holder.getSurfaceFrame().width();
         height = holder.getSurfaceFrame().height();
@@ -54,6 +59,9 @@ public class Game {
         paddleShadow = BitmapFactory.decodeResource(resources, R.drawable.paddleshadow);
 
         paddlePosY = (height - paddleImage.getHeight()) / 2;
+    }
+
+    public void init() {
 
         ball = new Ball(width, height, (width - ballImage.getWidth()) / 2,
                 (height - ballImage.getHeight()) / 2);
@@ -63,6 +71,21 @@ public class Game {
         ball.init(ballImage, ballShadow);
         player.init(paddleImage, paddleShadow);
         opponent.init(paddleImage, paddleShadow);
+
+        soundPool = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
+        sounds[Sounds.START] = soundPool.load(context, R.raw.start, 1);
+        sounds[Sounds.WIN] = soundPool.load(context, R.raw.win, 1);
+        sounds[Sounds.LOSE] = soundPool.load(context, R.raw.lose, 1);
+        sounds[Sounds.BOUNCE1] = soundPool.load(context, R.raw.bounce1, 1);
+        sounds[Sounds.BOUNCE2] = soundPool.load(context, R.raw.bounce2, 1);
+
+        soundPool.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
+            @Override
+            public void onLoadComplete(SoundPool soundPool, int sampleId, int status) {
+                if (sounds[Sounds.START] == sampleId)
+                    soundPool.play(sampleId, 1.0f, 1.0f, 1, 0, 1);
+            }
+        });
     }
 
     private void resetGamePositions() {
@@ -80,15 +103,19 @@ public class Game {
         if (player.getSpriteBounds().contains(ball.getSpriteBounds().right,
                 ball.getSpriteBounds().centerY())) {
             ball.moveLeft();
+            soundPool.play(sounds[Sounds.BOUNCE1], 1.0f, 1.0f, 1, 0, 1);
         } else if (opponent.getSpriteBounds().contains(ball.getSpriteBounds().left,
                 ball.getSpriteBounds().centerY())) {
             ball.moveRight();
+            soundPool.play(sounds[Sounds.BOUNCE2], 1.0f, 1.0f, 1, 0, 1);
         } else if (ball.getSpriteBounds().left < opponent.getSpriteBounds().left) {
             resetGamePositions();
             state = State.WON;
+            soundPool.play(sounds[Sounds.WIN], 1.0f, 1.0f, 1, 0, 1);
         } else if (ball.getSpriteBounds().right > player.getSpriteBounds().right) {
             resetGamePositions();
             state = State.LOST;
+            soundPool.play(sounds[Sounds.LOSE], 1.0f, 1.0f, 1, 0, 1);
         }
 
         ball.update(elapsed);
@@ -103,6 +130,7 @@ public class Game {
     }
 
     private void drawText(Canvas canvas, String text) {
+
         Paint textPaint = new Paint();
         textPaint.setTextAlign(Align.CENTER);
         textPaint.setAntiAlias(true);
