@@ -2,6 +2,7 @@ package com.diamond.iain.tennisgame;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Rect;
 
 public class Sprite {
 
@@ -11,6 +12,9 @@ public class Sprite {
     protected int screenHeight;
     private Bitmap image;
     private Bitmap shadow;
+
+    private Rect bounds;
+
     protected int imageHeight;
     protected int imageWidth;
 
@@ -30,10 +34,20 @@ public class Sprite {
 
         imageHeight = image.getHeight();
         imageWidth = image.getWidth();
+
+        bounds = new Rect(0, 0, imageWidth, imageHeight);
     }
 
     public void draw(Canvas canvas) {
         canvas.drawBitmap(shadow, x, y, null);
         canvas.drawBitmap(image, x, y, null);
+    }
+
+    public Rect getSpriteBounds() {
+
+        int _x = (int) x;
+        int _y = (int) y;
+
+        return new Rect(_x, _y, _x + bounds.width(), _y + bounds.height());
     }
 }

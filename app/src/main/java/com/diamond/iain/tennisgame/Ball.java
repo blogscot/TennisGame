@@ -45,4 +45,12 @@ public class Ball extends Sprite {
             directionY *= -1;
         }
     }
+
+    public void moveRight() {
+        directionX = 1;
+    }
+
+    public void moveLeft() {
+        directionX = -1;
+    }
 }

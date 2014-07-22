@@ -45,6 +45,15 @@ public class Game {
     }
 
     public void update(long elapsed) {
+
+        if (player.getSpriteBounds().contains(ball.getSpriteBounds().right,
+                ball.getSpriteBounds().centerY())) {
+            ball.moveLeft();
+        } else if (opponent.getSpriteBounds().contains(ball.getSpriteBounds().left,
+                ball.getSpriteBounds().centerY())) {
+            ball.moveRight();
+        }
+
         ball.update(elapsed);
         opponent.update(elapsed, ball);
     }
