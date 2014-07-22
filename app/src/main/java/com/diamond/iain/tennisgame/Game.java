@@ -46,6 +46,7 @@ public class Game {
 
     public void update(long elapsed) {
         ball.update(elapsed);
+        opponent.update(elapsed, ball);
     }
 
     public void draw() {

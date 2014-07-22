@@ -16,8 +16,8 @@ public class Ball extends Sprite {
 
         Random random = new Random();
 
-        directionX = random.nextInt(2)*2-1; // (0,1) -> (0,2) -> (-1, 1)
-        directionY = random.nextInt(2)*2-1;
+        directionX = random.nextInt(2) * 2 - 1; // (0,1) -> (0,2) -> (-1, 1)
+        directionY = random.nextInt(2) * 2 - 1;
     }
 
     public void update(long elapsed) {
@@ -33,16 +33,14 @@ public class Ball extends Sprite {
         if (x <= 0) {
             x = 0;
             directionX *= -1;
-        }
-        if (x >= maxWidth) {
+        } else if (x >= maxWidth) {
             x = maxWidth;
             directionX *= -1;
         }
         if (y <= 0) {
             y = 0;
             directionY *= -1;
-        }
-        if (y >= maxHeight) {
+        } else if (y >= maxHeight) {
             y = maxHeight;
             directionY *= -1;
         }
