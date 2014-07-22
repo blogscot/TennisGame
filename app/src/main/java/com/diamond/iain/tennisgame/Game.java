@@ -5,10 +5,20 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Paint.Align;
+import android.graphics.Typeface;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 
 public class Game {
+
+    private enum State {
+        PAUSED, WON, LOST, RUNNING
+    }
+
+    private State state = State.PAUSED;
+
     private static final String TAG = Game.class.getSimpleName();
 
     private SurfaceHolder holder;
@@ -18,6 +28,16 @@ public class Game {
     private Paddle player;
     private Paddle opponent;
 
+    private int width;
+    private int height;
+
+    private Bitmap ballImage;
+    private Bitmap ballShadow;
+    private Bitmap paddleImage;
+    private Bitmap paddleShadow;
+
+    private int paddlePosY;
+
     public Game(SurfaceHolder holder, Resources resources) {
         this.holder = holder;
         this.resources = resources;
@@ -25,14 +45,15 @@ public class Game {
 
     public void init() {
 
-        final int width = holder.getSurfaceFrame().width();
-        final int height = holder.getSurfaceFrame().height();
-        final Bitmap ballImage = BitmapFactory.decodeResource(resources, R.drawable.ball);
-        final Bitmap ballShadow = BitmapFactory.decodeResource(resources, R.drawable.ballshadow);
-        final Bitmap paddleImage = BitmapFactory.decodeResource(resources, R.drawable.paddle);
-        final Bitmap paddleShadow = BitmapFactory.decodeResource(resources, R.drawable.paddleshadow);
+        width = holder.getSurfaceFrame().width();
+        height = holder.getSurfaceFrame().height();
 
-        final int paddlePosY = (height - paddleImage.getHeight()) / 2;
+        ballImage = BitmapFactory.decodeResource(resources, R.drawable.ball);
+        ballShadow = BitmapFactory.decodeResource(resources, R.drawable.ballshadow);
+        paddleImage = BitmapFactory.decodeResource(resources, R.drawable.paddle);
+        paddleShadow = BitmapFactory.decodeResource(resources, R.drawable.paddleshadow);
+
+        paddlePosY = (height - paddleImage.getHeight()) / 2;
 
         ball = new Ball(width, height, (width - ballImage.getWidth()) / 2,
                 (height - ballImage.getHeight()) / 2);
@@ -44,7 +65,17 @@ public class Game {
         opponent.init(paddleImage, paddleShadow);
     }
 
-    public void update(long elapsed) {
+    private void resetGamePositions() {
+
+        ball.setPosition((width - ballImage.getWidth()) / 2,
+                (height - ballImage.getHeight()) / 2);
+        player.setPosition(width - 100, paddlePosY);
+        opponent.setPosition(50, paddlePosY);
+
+        ball.setRandomDirection();
+    }
+
+    private void updateGame(long elapsed) {
 
         if (player.getSpriteBounds().contains(ball.getSpriteBounds().right,
                 ball.getSpriteBounds().centerY())) {
@@ -52,10 +83,33 @@ public class Game {
         } else if (opponent.getSpriteBounds().contains(ball.getSpriteBounds().left,
                 ball.getSpriteBounds().centerY())) {
             ball.moveRight();
+        } else if (ball.getSpriteBounds().left < opponent.getSpriteBounds().left) {
+            resetGamePositions();
+            state = State.WON;
+        } else if (ball.getSpriteBounds().right > player.getSpriteBounds().right) {
+            resetGamePositions();
+            state = State.LOST;
         }
 
         ball.update(elapsed);
         opponent.update(elapsed, ball);
+    }
+
+    public void update(long elapsed) {
+
+        if (state == State.RUNNING) {
+            updateGame(elapsed);
+        }
+    }
+
+    private void drawText(Canvas canvas, String text) {
+        Paint textPaint = new Paint();
+        textPaint.setTextAlign(Align.CENTER);
+        textPaint.setAntiAlias(true);
+        textPaint.setColor(Color.BLUE);
+        textPaint.setTextSize(62);
+        textPaint.setTypeface(Typeface.DEFAULT_BOLD);
+        canvas.drawText(text, canvas.getWidth() / 2, canvas.getHeight() / 2, textPaint);
     }
 
     public void draw() {
@@ -64,15 +118,47 @@ public class Game {
         if (canvas != null) {
             canvas.drawColor(Color.WHITE);
 
-            ball.draw(canvas);
-            player.draw(canvas);
-            opponent.draw(canvas);
+            switch (state) {
+                case PAUSED:
+                    drawText(canvas, "Tap Screen to Start");
+                    break;
+                case WON:
+                    drawText(canvas, "You Won!");
+                    break;
+                case LOST:
+                    drawText(canvas, "You Lost!");
+                    break;
+                case RUNNING:
+                    drawGame(canvas);
+                    break;
+            }
 
             holder.unlockCanvasAndPost(canvas);
         }
     }
 
+    private void drawGame(Canvas canvas) {
+
+        canvas.drawColor(Color.WHITE);
+
+        ball.draw(canvas);
+        player.draw(canvas);
+        opponent.draw(canvas);
+    }
+
     public void onTouchEvent(MotionEvent event) {
-        player.setPosition(event);
+
+        // User has to tap the centre of the screen to restart game
+        float screenCentreX = width / 2;
+        float screenCentreY = height / 2;
+        int diffX = (int) Math.abs(screenCentreX - event.getX());
+        int diffY = (int) Math.abs(screenCentreY - event.getY());
+
+        if (state == State.RUNNING) {
+            player.setPosition(event);
+        } else if (diffX < 200 && diffY < 200) {
+
+            state = State.RUNNING;
+        }
     }
 }

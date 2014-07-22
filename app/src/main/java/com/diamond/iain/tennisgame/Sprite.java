@@ -50,4 +50,9 @@ public class Sprite {
 
         return new Rect(_x, _y, _x + bounds.width(), _y + bounds.height());
     }
+
+    public void setPosition(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
 }

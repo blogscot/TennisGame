@@ -14,10 +14,7 @@ public class Ball extends Sprite {
     public Ball(int screenWidth, int screenHeight, int x, int y) {
         super(screenWidth, screenHeight, x, y);
 
-        Random random = new Random();
-
-        directionX = random.nextInt(2) * 2 - 1; // (0,1) -> (0,2) -> (-1, 1)
-        directionY = random.nextInt(2) * 2 - 1;
+        setRandomDirection();
     }
 
     public void update(long elapsed) {
@@ -44,6 +41,13 @@ public class Ball extends Sprite {
             y = maxHeight;
             directionY *= -1;
         }
+    }
+
+    public void setRandomDirection() {
+        Random random = new Random();
+
+        directionX = random.nextInt(2) * 2 - 1; // (0,1) -> (0,2) -> (-1, 1)
+        directionY = random.nextInt(2) * 2 - 1;
     }
 
     public void moveRight() {
